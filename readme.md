@@ -15,7 +15,6 @@ Go-util open for using for anyone.
 - JWT create & parsing
 - Logging
 - Pagination (need test)
-- Password encryption
 - Random value
 - Reponse json (for gin-gonic framework)
 - Telegram connection
