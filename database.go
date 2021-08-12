@@ -26,13 +26,26 @@ func NewMySQL(user, password, url, schema string) (*sql.DB, error) {
 }
 
 // NewGorm is a override sql from native sql to gorm
-func NewGorm(db *sql.DB, driverName string) (*gorm.DB, error) {
+// driverName is a package of database your using
+// level is a info log of query, value is 1 - 4 and default is 1
+func NewGorm(db *sql.DB, driverName string, level int) (*gorm.DB, error) {
+	var loglevel = logger.Silent
+	if level == 1 {
+		loglevel = logger.Silent
+	} else if level == 2 {
+		loglevel = logger.Error
+	} else if level == 3 {
+		loglevel = logger.Warn
+	} else if level == 4 {
+		loglevel = logger.Info
+	}
+
 	switch driverName {
 	case "mysql":
 		return gorm.Open(mysql.New(mysql.Config{Conn: db}), &gorm.Config{
 			Logger: logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logger.Config{
 				SlowThreshold: time.Second,
-				LogLevel:      logger.Warn,
+				LogLevel:      loglevel,
 				Colorful:      true,
 			})})
 	default:
