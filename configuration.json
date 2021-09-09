@@ -1,0 +1,7 @@
+{
+    "port": 8080,
+    "service_name": "my service",
+    "model": {
+        "model_name": "my model"
+    }
+}
