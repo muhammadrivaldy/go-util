@@ -21,12 +21,13 @@ type logs struct {
 type Logs interface {
 	Config(osFile *os.File)
 	Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
-	Error(ctx context.Context, status int, err error) (int, error)
+	Error(ctx context.Context, status int, err error) error
 	Undo()
 	Sync()
 }
 
 func encodeConfig(osFile *os.File, telegram TeleService) (logs, error) {
+
 	encoder := zap.NewProductionEncoderConfig()
 	encoder.EncodeTime.UnmarshalText([]byte("ISO8601"))
 
@@ -48,6 +49,7 @@ func encodeConfig(osFile *os.File, telegram TeleService) (logs, error) {
 
 // NewLog is a function for set up log information in this service
 func NewLog(osFile *os.File, telegram TeleService) Logs {
+
 	logs, err := encodeConfig(osFile, telegram)
 	if err != nil {
 		return nil
@@ -57,6 +59,7 @@ func NewLog(osFile *os.File, telegram TeleService) Logs {
 }
 
 func (l *logs) Config(osFile *os.File) {
+
 	logs, err := encodeConfig(osFile, l.telegram)
 	if err != nil {
 		return
@@ -70,6 +73,7 @@ func (l *logs) Config(osFile *os.File) {
 }
 
 func (l *logs) Info(ctx context.Context, msg string, zapFields ...zapcore.Field) {
+
 	zapcore := zapcoreField(ctx)
 	if zapFields != nil {
 		zapcore = append(zapcore, zapFields...)
@@ -79,10 +83,11 @@ func (l *logs) Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
 		l.logger.Info(msg, zapcore...)
 		return
 	}
+
 	l.logger.Info(msg)
 }
 
-func (l *logs) Error(ctx context.Context, status int, err error) (int, error) {
+func (l *logs) Error(ctx context.Context, status int, err error) error {
 
 	// convert error to string
 	msgError := err.Error()
@@ -101,15 +106,14 @@ func (l *logs) Error(ctx context.Context, status int, err error) (int, error) {
 	// log with info context
 	if ctx != nil {
 		l.logger.Error(msgError, zapcoreField(ctx)...)
-		return status, err
+		return err
 	}
 
 	// log without info context
 	l.logger.Error(msgError)
 
 	// send error
-	return status, err
-
+	return err
 }
 
 func (l *logs) Undo() {
@@ -121,6 +125,7 @@ func (l *logs) Sync() {
 }
 
 func zapcoreField(ctx context.Context) (zapFields []zapcore.Field) {
+
 	res := GetContext(ctx)
 	zapFields = append(zapFields, zap.String("request-id", res.RequestID))
 	zapFields = append(zapFields, zap.String("method", res.Method))
@@ -146,7 +151,5 @@ func LogMiddleware(logger Logs) func(c *gin.Context) {
 
 		// log info response
 		logger.Info(ctx, "response")
-
 	}
-
 }
