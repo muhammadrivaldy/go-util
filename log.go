@@ -21,7 +21,7 @@ type logs struct {
 type Logs interface {
 	Config(osFile *os.File)
 	Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
-	Error(ctx context.Context, status int, err error) error
+	Error(ctx context.Context, status int, err error)
 	Undo()
 	Sync()
 }
@@ -87,7 +87,7 @@ func (l *logs) Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
 	l.logger.Info(msg)
 }
 
-func (l *logs) Error(ctx context.Context, status int, err error) error {
+func (l *logs) Error(ctx context.Context, status int, err error) {
 
 	// convert error to string
 	msgError := err.Error()
@@ -106,14 +106,14 @@ func (l *logs) Error(ctx context.Context, status int, err error) error {
 	// log with info context
 	if ctx != nil {
 		l.logger.Error(msgError, zapcoreField(ctx)...)
-		return err
+		return
 	}
 
 	// log without info context
 	l.logger.Error(msgError)
 
 	// send error
-	return err
+	return
 }
 
 func (l *logs) Undo() {
