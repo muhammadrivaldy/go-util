@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -24,8 +25,10 @@ const (
 )
 
 // NewMySQL is a function for set up db connection
-func NewMySQL(user, password, url, schema string) (*sql.DB, error) {
-	conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", user, password, url, schema)
+func NewMySQL(user, password, url, schema string, parameters []string) (*sql.DB, error) {
+
+	parameter := strings.Join(parameters, "&")
+	conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?%s", user, password, url, schema, parameter)
 	db, err := sql.Open("mysql", conn)
 	if err != nil {
 		return nil, err
@@ -54,6 +57,7 @@ func NewGorm(db *sql.DB, driverName string, level logLevel) (*gorm.DB, error) {
 
 // NewSqlx is a override sql from native sql to sqlx
 func NewSqlx(db *sql.DB, driverName string) *sqlx.DB {
+
 	sqlxCon := sqlx.NewDb(db, driverName)
 	sqlxCon.SetConnMaxLifetime(time.Minute * 3)
 	sqlxCon.SetMaxOpenConns(10)
