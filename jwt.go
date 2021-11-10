@@ -24,10 +24,10 @@ type JWT struct {
 }
 
 // CreateJWT is a function for generate token & refresh token
-func CreateJWT(req JWT, key string) (token, refresh string, err error) {
+func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refresh string, err error) {
 
 	// create jwt token
-	t := jwt.New(jwt.SigningMethodHS256)
+	t := jwt.New(signMethod)
 	tClaims := t.Claims.(jwt.MapClaims)
 	tClaims["userid"] = req.UserID
 	tClaims["fullname"] = req.Name
@@ -41,7 +41,7 @@ func CreateJWT(req JWT, key string) (token, refresh string, err error) {
 	}
 
 	// create refresh jwt token
-	r := jwt.New(jwt.SigningMethodHS256)
+	r := jwt.New(signMethod)
 	rClaims := r.Claims.(jwt.MapClaims)
 	rClaims["userid"] = req.UserID
 	rClaims["exp"] = req.ExpRefresh.Unix()
@@ -55,7 +55,7 @@ func CreateJWT(req JWT, key string) (token, refresh string, err error) {
 }
 
 // ParseJWT is a function for parse of token string
-func ParseJWT(key string) func(c *gin.Context) {
+func ParseJWT(key string, signMethod jwt.SigningMethod) func(c *gin.Context) {
 	return func(c *gin.Context) {
 
 		// get value authorization from header
@@ -71,7 +71,9 @@ func ParseJWT(key string) func(c *gin.Context) {
 
 		// parse token
 		token, err := jwt.Parse(authorization, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			if method, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			} else if method != signMethod {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
 
