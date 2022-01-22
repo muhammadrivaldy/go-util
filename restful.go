@@ -25,6 +25,19 @@ type RequestPayload struct {
 	ContentType contentType
 	Payload     interface{}
 	Response    interface{}
+	Headers     map[string]string
+}
+
+type BasicAuthPayload struct {
+	Path     string
+	Payload  BasicAuth
+	Response interface{}
+	Headers  map[string]string
+}
+
+type BasicAuth struct {
+	Username string
+	Password string
 }
 
 type RESTful struct {
@@ -68,6 +81,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 			}
 
 			request.Header.Add("content-type", string(req.ContentType))
+			setHeader(request, req.Headers)
 
 		} else if req.ContentType == ContentTypeFormURLEncoded {
 
@@ -82,6 +96,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 					}
 
 					request.Header.Add("Content-Type", string(ContentTypeFormURLEncoded))
+					setHeader(request, req.Headers)
 
 				} else {
 					return statusCode, errors.New("payload isn't url.Values")
@@ -133,4 +148,74 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 	}
 
 	return statusCode, errors.New("retry need to setup greater than 0")
+}
+
+func (r *RESTful) RequestBasicAuth(req BasicAuthPayload) (statusCode int, err error) {
+
+	for i := 0; i < r.retry; i++ {
+
+		var client *http.Client
+		var request *http.Request
+		var urlRequest = r.baseURL + req.Path
+
+		if req.Payload.Username == "" {
+			return statusCode, errors.New("username must be filled")
+		}
+
+		if req.Payload.Password == "" {
+			return statusCode, errors.New("password must be filled")
+		}
+
+		request, err = http.NewRequest(http.MethodGet, urlRequest, nil)
+		if err != nil {
+			return statusCode, err
+		}
+		setHeader(request, req.Headers)
+
+		// action request
+		response, err := client.Do(request)
+		if err != nil {
+			return statusCode, err
+		}
+
+		// if statuscode isn't ok, we'll retry the request
+		// but, if the retry still failed we'll return the error
+		if (i + 1) == r.retry {
+			return response.StatusCode, errors.New(http.StatusText(response.StatusCode))
+		} else if response.StatusCode >= http.StatusBadRequest {
+			continue
+		}
+
+		// getting content type
+		contentType, _, err := mime.ParseMediaType(response.Header.Get("content-type"))
+		if err != nil {
+			return response.StatusCode, err
+		}
+
+		// setup response
+		if contentType == string(ContentTypeJSON) {
+
+			if req.Response != nil {
+
+				resBytes, err := ioutil.ReadAll(response.Body)
+				if err != nil {
+					return response.StatusCode, err
+				}
+
+				if err = json.Unmarshal(resBytes, req.Response); err != nil {
+					return response.StatusCode, err
+				}
+			}
+		}
+
+		return response.StatusCode, err
+	}
+
+	return statusCode, errors.New("retry need to setup greater than 0")
+}
+
+func setHeader(request *http.Request, headers map[string]string) {
+	for h, i := range headers {
+		request.Header.Set(h, i)
+	}
 }
