@@ -27,19 +27,19 @@ type RequestPayload struct {
 	Response    interface{}
 }
 
-type restful struct {
+type RESTful struct {
 	retry   int
 	baseURL string
 }
 
-func NewRestful(baseURL string, retry int) *restful {
-	return &restful{
+func NewRESTful(baseURL string, retry int) *RESTful {
+	return &RESTful{
 		retry:   retry,
 		baseURL: baseURL,
 	}
 }
 
-func (r *restful) Request(req RequestPayload) (statusCode int, err error) {
+func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 
 	for i := 0; i < r.retry; i++ {
 
