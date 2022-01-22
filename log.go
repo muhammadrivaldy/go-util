@@ -111,9 +111,6 @@ func (l *logs) Error(ctx context.Context, status int, err error) {
 
 	// log without info context
 	l.logger.Error(msgError)
-
-	// send error
-	return
 }
 
 func (l *logs) Undo() {
