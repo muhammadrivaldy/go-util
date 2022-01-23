@@ -30,6 +30,7 @@ type RequestPayload struct {
 
 type BasicAuthPayload struct {
 	Path     string
+	Method   string
 	Payload  BasicAuth
 	Response interface{}
 	Headers  map[string]string
@@ -166,7 +167,7 @@ func (r *RESTful) RequestBasicAuth(req BasicAuthPayload) (statusCode int, err er
 			return statusCode, errors.New("password must be filled")
 		}
 
-		request, err = http.NewRequest(http.MethodGet, urlRequest, nil)
+		request, err = http.NewRequest(req.Method, urlRequest, nil)
 		if err != nil {
 			return statusCode, err
 		}
