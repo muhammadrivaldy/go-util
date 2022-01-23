@@ -1,4 +1,4 @@
-package util
+package goutil
 
 // Pagination is a function for calculate of limit & offset
 func Pagination(limit, offset int) (limits, offsets int) {
