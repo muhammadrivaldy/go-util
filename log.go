@@ -2,7 +2,6 @@ package goutil
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"runtime"
 
@@ -21,7 +20,7 @@ type logs struct {
 type Logs interface {
 	Config(osFile *os.File)
 	Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
-	Error(ctx context.Context, status int, err error)
+	Error(ctx context.Context, err error)
 	Undo()
 	Sync()
 }
@@ -87,21 +86,16 @@ func (l *logs) Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
 	l.logger.Info(msg)
 }
 
-func (l *logs) Error(ctx context.Context, status int, err error) {
+func (l *logs) Error(ctx context.Context, err error) {
 
 	// convert error to string
 	msgError := err.Error()
 
-	// validate by status response
-	if status != http.StatusNotFound && status != http.StatusBadRequest {
+	// get path & line
+	_, path, line, _ := runtime.Caller(1)
 
-		// get path & line
-		_, path, line, _ := runtime.Caller(1)
-
-		// send error to telegram
-		l.telegram.SendError(ctx, path, line, msgError)
-
-	}
+	// send error to telegram
+	l.telegram.SendError(ctx, path, line, msgError)
 
 	// log with info context
 	if ctx != nil {
@@ -147,6 +141,6 @@ func LogMiddleware(logger Logs) func(c *gin.Context) {
 		c.Next()
 
 		// log info response
-		logger.Info(ctx, "response")
+		logger.Info(ctx, "response", zap.Int("status", c.Writer.Status()))
 	}
 }
