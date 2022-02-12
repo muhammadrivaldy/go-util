@@ -192,7 +192,9 @@ func (r *RESTful) RequestBasicAuth(req BasicAuthPayload) (statusCode int, err er
 		if err != nil {
 			return statusCode, err
 		}
+
 		setHeader(request, req.Headers)
+		request.SetBasicAuth(req.Payload.Username, req.Payload.Password)
 
 		// action request
 		response, err := client.Do(request)
