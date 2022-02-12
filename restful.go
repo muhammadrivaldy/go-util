@@ -21,6 +21,7 @@ const (
 
 type RequestPayload struct {
 	Path        string
+	QueryParam  map[string]string
 	Method      string
 	ContentType contentType
 	Payload     interface{}
@@ -53,13 +54,33 @@ func NewRESTful(baseURL string, retry int) *RESTful {
 	}
 }
 
+func setQueryParam(baseURL, pathURL string, queryParam map[string]string) (urlRequest string, err error) {
+
+	urlRequest = baseURL + pathURL
+	urls, err := url.Parse(urlRequest)
+	if err != nil {
+		return urlRequest, err
+	}
+
+	q := urls.Query()
+	for key, val := range queryParam {
+		q.Add(key, val)
+	}
+	urls.RawQuery = q.Encode()
+
+	return urlRequest, err
+}
+
 func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 
 	for i := 0; i < r.retry; i++ {
 
 		var client *http.Client
 		var request *http.Request
-		var urlRequest = r.baseURL + req.Path
+		urlRequest, err := setQueryParam(r.baseURL, req.Path, req.QueryParam)
+		if err != nil {
+			return statusCode, err
+		}
 
 		// setup request
 		if req.ContentType == ContentTypeJSON {
