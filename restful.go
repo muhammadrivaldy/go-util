@@ -75,7 +75,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 
 	for i := 0; i < r.retry; i++ {
 
-		var client *http.Client
+		var client = &http.Client{}
 		var request *http.Request
 		urlRequest, err := setQueryParam(r.baseURL, req.Path, req.QueryParam)
 		if err != nil {
@@ -176,7 +176,7 @@ func (r *RESTful) RequestBasicAuth(req BasicAuthPayload) (statusCode int, err er
 
 	for i := 0; i < r.retry; i++ {
 
-		var client *http.Client
+		var client = &http.Client{}
 		var request *http.Request
 		var urlRequest = r.baseURL + req.Path
 
