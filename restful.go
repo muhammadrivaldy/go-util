@@ -240,6 +240,6 @@ func (r *RESTful) RequestBasicAuth(req BasicAuthPayload) (statusCode int, err er
 
 func setHeader(request *http.Request, headers map[string]string) {
 	for h, i := range headers {
-		request.Header.Set(h, i)
+		request.Header.Add(h, i)
 	}
 }
