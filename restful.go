@@ -102,7 +102,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 				return statusCode, err
 			}
 
-			request.Header.Add("content-type", string(req.ContentType))
+			request.Header.Add("content-type", string(ContentTypeJSON))
 			setHeader(request, req.Headers)
 
 		} else if req.ContentType == ContentTypeFormURLEncoded {
