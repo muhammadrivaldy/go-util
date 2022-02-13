@@ -85,6 +85,8 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 		// setup request
 		if req.ContentType == ContentTypeJSON {
 
+			payload := &strings.Reader{}
+
 			if req.Payload != nil {
 
 				payloadJSON, err := json.Marshal(req.Payload)
@@ -92,15 +94,16 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 					return statusCode, err
 				}
 
-				payload := strings.NewReader(string(payloadJSON))
-				request, err = http.NewRequest(req.Method, urlRequest, payload)
-				if err != nil {
-					return statusCode, err
-				}
-
-				request.Header.Add("content-type", string(ContentTypeJSON))
-				setHeader(request, req.Headers)
+				payload = strings.NewReader(string(payloadJSON))
 			}
+
+			request, err = http.NewRequest(req.Method, urlRequest, payload)
+			if err != nil {
+				return statusCode, err
+			}
+
+			request.Header.Add("content-type", string(ContentTypeJSON))
+			setHeader(request, req.Headers)
 
 		} else if req.ContentType == ContentTypeFormURLEncoded {
 
