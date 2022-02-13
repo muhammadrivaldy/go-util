@@ -68,7 +68,7 @@ func setQueryParam(baseURL, pathURL string, queryParam map[string]string) (urlRe
 	}
 	urls.RawQuery = q.Encode()
 
-	return urlRequest, err
+	return urls.String(), err
 }
 
 func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
@@ -85,8 +85,6 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 		// setup request
 		if req.ContentType == ContentTypeJSON {
 
-			var payload *strings.Reader
-
 			if req.Payload != nil {
 
 				payloadJSON, err := json.Marshal(req.Payload)
@@ -94,16 +92,15 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 					return statusCode, err
 				}
 
-				payload = strings.NewReader(string(payloadJSON))
-			}
+				payload := strings.NewReader(string(payloadJSON))
+				request, err = http.NewRequest(req.Method, urlRequest, payload)
+				if err != nil {
+					return statusCode, err
+				}
 
-			request, err = http.NewRequest(req.Method, urlRequest, payload)
-			if err != nil {
-				return statusCode, err
+				request.Header.Add("content-type", string(ContentTypeJSON))
+				setHeader(request, req.Headers)
 			}
-
-			request.Header.Add("content-type", string(ContentTypeJSON))
-			setHeader(request, req.Headers)
 
 		} else if req.ContentType == ContentTypeFormURLEncoded {
 
