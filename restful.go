@@ -3,6 +3,7 @@ package goutil
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -136,18 +137,24 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 			return statusCode, err
 		}
 
-		// if statuscode isn't ok, we'll retry the request
-		// but, if the retry still failed we'll return the error
-		if (i + 1) == r.retry {
-			return response.StatusCode, errors.New(http.StatusText(response.StatusCode))
-		} else if response.StatusCode >= http.StatusBadRequest {
-			continue
-		}
-
 		// getting content type
 		contentType, _, err := mime.ParseMediaType(response.Header.Get("content-type"))
 		if err != nil {
 			return response.StatusCode, err
+		}
+
+		// if statuscode isn't ok, we'll retry the request
+		// but, if the retry still failed we'll return the error
+		if (i + 1) == r.retry {
+			errorMessage := fmt.Sprintf("Status code: %d / %s", response.StatusCode, http.StatusText(response.StatusCode))
+			if contentType == string(ContentTypeJSON) {
+				resBytes, _ := ioutil.ReadAll(response.Body)
+				errorMessage = fmt.Sprintf("%s, Response: %s", errorMessage, string(resBytes))
+			}
+
+			return response.StatusCode, errors.New(errorMessage)
+		} else if response.StatusCode >= http.StatusBadRequest {
+			continue
 		}
 
 		// setup response
