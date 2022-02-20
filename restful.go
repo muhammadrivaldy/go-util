@@ -113,7 +113,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 				if reflect.TypeOf(req.Payload).String() == "url.Values" {
 
 					values := req.Payload.(url.Values)
-					request, err = http.NewRequest(http.MethodPost, urlRequest, strings.NewReader(values.Encode()))
+					request, err = http.NewRequest(req.Method, urlRequest, strings.NewReader(values.Encode()))
 					if err != nil {
 						return statusCode, err
 					}
