@@ -152,7 +152,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 			}
 
 			if req.PayloadFile != nil && reflect.TypeOf(req.PayloadFile).String() == "url.Values" {
-				values := req.Payload.(url.Values)
+				values := req.PayloadFile.(url.Values)
 				for key, value := range values {
 					for _, i := range value {
 						file, err := os.Open(i)
