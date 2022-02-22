@@ -1,13 +1,18 @@
 package goutil
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 )
@@ -15,9 +20,10 @@ import (
 type contentType string
 
 const (
-	ContentTypeJSON           contentType = "application/json"
-	ContentTypeFormURLEncoded contentType = "application/x-www-form-urlencoded"
-	ContentTypeTextHTML       contentType = "text/html"
+	ContentTypeJSON              contentType = "application/json"
+	ContentTypeFormURLEncoded    contentType = "application/x-www-form-urlencoded"
+	ContentTypeTextHTML          contentType = "text/html"
+	ContentTypeMultipartFormData contentType = "multipart/form-data"
 )
 
 type RequestPayload struct {
@@ -26,6 +32,7 @@ type RequestPayload struct {
 	Method      string
 	ContentType contentType
 	Payload     interface{}
+	PayloadFile interface{}
 	Response    interface{}
 	Headers     map[string]string
 }
@@ -104,34 +111,79 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 			}
 
 			request.Header.Add("content-type", string(ContentTypeJSON))
-			setHeader(request, req.Headers)
 
 		} else if req.ContentType == ContentTypeFormURLEncoded {
 
-			if req.Payload != nil {
-
-				if reflect.TypeOf(req.Payload).String() == "url.Values" {
-
-					values := req.Payload.(url.Values)
-					request, err = http.NewRequest(req.Method, urlRequest, strings.NewReader(values.Encode()))
-					if err != nil {
-						return statusCode, err
-					}
-
-					request.Header.Add("Content-Type", string(ContentTypeFormURLEncoded))
-					setHeader(request, req.Headers)
-
-				} else {
-					return statusCode, errors.New("payload isn't url.Values")
-				}
-			} else {
+			if req.Payload == nil {
 				return statusCode, errors.New("payload is nil")
 			}
+
+			if reflect.TypeOf(req.Payload).String() == "url.Values" {
+
+				values := req.Payload.(url.Values)
+				request, err = http.NewRequest(req.Method, urlRequest, strings.NewReader(values.Encode()))
+				if err != nil {
+					return statusCode, err
+				}
+
+				request.Header.Add("Content-Type", string(ContentTypeFormURLEncoded))
+
+			} else {
+				return statusCode, errors.New("payload isn't url.Values")
+			}
+
+		} else if req.ContentType == ContentTypeMultipartFormData {
+
+			body := &bytes.Buffer{}
+			writer := multipart.NewWriter(body)
+			defer writer.Close()
+
+			if req.Payload == nil && req.PayloadFile == nil {
+				return statusCode, errors.New("payload is nil")
+			}
+
+			if reflect.TypeOf(req.Payload).String() == "url.Values" {
+				values := req.Payload.(url.Values)
+				for key, value := range values {
+					for _, i := range value {
+						writer.WriteField(key, i)
+					}
+				}
+			}
+
+			if reflect.TypeOf(req.PayloadFile).String() == "url.Values" {
+				values := req.Payload.(url.Values)
+				for key, value := range values {
+					for _, i := range value {
+						file, err := os.Open(i)
+						if err != nil {
+							return statusCode, err
+						}
+						defer file.Close()
+
+						part, err := writer.CreateFormFile(key, filepath.Base(i))
+						if err != nil {
+							return statusCode, err
+						}
+
+						io.Copy(part, file)
+					}
+				}
+			}
+
+			request, err = http.NewRequest(req.Method, urlRequest, body)
+			if err != nil {
+				return statusCode, err
+			}
+
+			request.Header.Add("Content-Type", writer.FormDataContentType())
+
 		} else {
 			return statusCode, errors.New("you must to choice the content type")
 		}
 
 		// action request
+		setHeader(request, req.Headers)
 		response, err := client.Do(request)
 		if err != nil {
 			return statusCode, err
