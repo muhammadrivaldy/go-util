@@ -142,7 +142,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 				return statusCode, errors.New("payload is nil")
 			}
 
-			if reflect.TypeOf(req.Payload).String() == "url.Values" {
+			if req.Payload != nil && reflect.TypeOf(req.Payload).String() == "url.Values" {
 				values := req.Payload.(url.Values)
 				for key, value := range values {
 					for _, i := range value {
@@ -151,7 +151,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 				}
 			}
 
-			if reflect.TypeOf(req.PayloadFile).String() == "url.Values" {
+			if req.PayloadFile != nil && reflect.TypeOf(req.PayloadFile).String() == "url.Values" {
 				values := req.Payload.(url.Values)
 				for key, value := range values {
 					for _, i := range value {
