@@ -136,7 +136,6 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 
 			body := &bytes.Buffer{}
 			writer := multipart.NewWriter(body)
-			defer writer.Close()
 
 			if req.Payload == nil && req.PayloadFile == nil {
 				return statusCode, errors.New("payload is nil")
@@ -170,6 +169,8 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 					}
 				}
 			}
+
+			writer.Close()
 
 			request, err = http.NewRequest(req.Method, urlRequest, body)
 			if err != nil {
