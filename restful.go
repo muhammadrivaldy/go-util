@@ -191,10 +191,8 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 		}
 
 		// getting content type
-		contentType, _, err := mime.ParseMediaType(response.Header.Get("content-type"))
-		if err != nil {
-			return response.StatusCode, err
-		}
+		// we don't need handle this error because isn't important
+		contentType, _, _ := mime.ParseMediaType(response.Header.Get("content-type"))
 
 		// if statuscode isn't ok, we'll retry the request
 		// but, if the retry still failed we'll return the error
