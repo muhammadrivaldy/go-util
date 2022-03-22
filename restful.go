@@ -198,7 +198,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 
 		// if statuscode isn't ok, we'll retry the request
 		// but, if the retry still failed we'll return the error
-		if (i + 1) == r.retry {
+		if ((i + 1) == r.retry) && response.StatusCode >= http.StatusBadRequest {
 			errorMessage := fmt.Sprintf("Status code: %d / %s", response.StatusCode, http.StatusText(response.StatusCode))
 			if contentType == string(ContentTypeJSON) {
 				resBytes, _ := ioutil.ReadAll(response.Body)
