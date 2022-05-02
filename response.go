@@ -1,7 +1,6 @@
 package goutil
 
 import (
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -14,9 +13,9 @@ type Response struct {
 }
 
 // ResponseOK is a function for send result to client
-func ResponseOK(c *gin.Context, obj interface{}) {
-	c.JSON(http.StatusOK, Response{
-		Code:    http.StatusOK,
+func ResponseOK(c *gin.Context, code int, obj interface{}) {
+	c.JSON(code, Response{
+		Code:    code,
 		Message: "Success",
 		Data:    obj,
 	})
