@@ -2,6 +2,7 @@ package goutil
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,11 +22,16 @@ func ResponseOK(c *gin.Context, obj interface{}) {
 	})
 }
 
-// ResponseError is a functoin for send result error to client
+// ResponseError is a function for send result error to client
 func ResponseError(c *gin.Context, code int, msg error, obj interface{}) {
+	message := strings.Split(msg.Error(), " ")
+	if len(message) > 0 {
+		message[0] = strings.ToTitle(message[0])
+	}
+
 	c.JSON(code, Response{
 		Code:    code,
-		Message: msg.Error(),
+		Message: message,
 		Data:    obj,
 	})
 }
