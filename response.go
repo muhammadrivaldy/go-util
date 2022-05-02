@@ -23,9 +23,12 @@ func ResponseOK(c *gin.Context, code int, obj interface{}) {
 
 // ResponseError is a function for send result error to client
 func ResponseError(c *gin.Context, code int, msg error, obj interface{}) {
-	message := strings.Split(msg.Error(), " ")
-	if len(message) > 0 {
-		message[0] = strings.ToTitle(message[0])
+
+	message := msg.Error()
+	messages := strings.Split(msg.Error(), " ")
+	if len(messages) > 0 {
+		messages[0] = strings.Title(messages[0])
+		message = strings.Join(messages, " ")
 	}
 
 	c.JSON(code, Response{
