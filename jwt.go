@@ -51,6 +51,7 @@ func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refres
 	r := jwt.New(signMethod)
 	rClaims := r.Claims.(jwt.MapClaims)
 	rClaims["user_id"] = req.UserID
+	rClaims["group_id"] = req.GroupID
 	rClaims["exp"] = req.ExpRefresh.Unix()
 	refresh, err = r.SignedString([]byte(key))
 	if err != nil {
