@@ -10,6 +10,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // JWT is a object
@@ -21,20 +22,26 @@ type JWT struct {
 	GroupID    int
 	ExpToken   time.Time
 	ExpRefresh time.Time
+	Jti        string
 }
 
 // CreateJWT is a function for generate token & refresh token
 func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refresh string, err error) {
 
+	if req.Jti == "" {
+		req.Jti = uuid.New().String()
+	}
+
 	// create jwt token
 	t := jwt.New(signMethod)
 	tClaims := t.Claims.(jwt.MapClaims)
-	tClaims["userid"] = req.UserID
-	tClaims["fullname"] = req.Name
+	tClaims["user_id"] = req.UserID
+	tClaims["name"] = req.Name
 	tClaims["phone"] = req.Phone
 	tClaims["email"] = req.Email
-	tClaims["groupid"] = req.GroupID
+	tClaims["group_id"] = req.GroupID
 	tClaims["exp"] = req.ExpToken.Unix()
+	tClaims["jti"] = req.Jti
 	token, err = t.SignedString([]byte(key))
 	if err != nil {
 		return
@@ -43,7 +50,7 @@ func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refres
 	// create refresh jwt token
 	r := jwt.New(signMethod)
 	rClaims := r.Claims.(jwt.MapClaims)
-	rClaims["userid"] = req.UserID
+	rClaims["user_id"] = req.UserID
 	rClaims["exp"] = req.ExpRefresh.Unix()
 	refresh, err = r.SignedString([]byte(key))
 	if err != nil {
@@ -97,11 +104,11 @@ func ParseJWT(key string, signMethod jwt.SigningMethod) func(c *gin.Context) {
 
 		// set value of token to gin.context
 		ctx := ParseContext(c)
-		ctx = context.WithValue(ctx, KeyUserID, claims["userid"])
-		ctx = context.WithValue(ctx, KeyFullname, claims["fullname"])
+		ctx = context.WithValue(ctx, KeyUserID, claims["user_id"])
+		ctx = context.WithValue(ctx, KeyFullname, claims["name"])
 		ctx = context.WithValue(ctx, KeyPhone, claims["phone"])
 		ctx = context.WithValue(ctx, KeyEmail, claims["email"])
-		ctx = context.WithValue(ctx, KeyGroupID, claims["groupid"])
+		ctx = context.WithValue(ctx, KeyGroupID, claims["group_id"])
 		ctx = context.WithValue(ctx, KeyExp, claims["exp"])
 		ctx = context.WithValue(ctx, KeyToken, authorization)
 
