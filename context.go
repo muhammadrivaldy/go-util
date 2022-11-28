@@ -19,19 +19,21 @@ const (
 	// KeyEndpoint ..
 	KeyEndpoint Key = "endpoint"
 	// KeyUserID ..
-	KeyUserID Key = "userid"
+	KeyUserID Key = "user_id"
 	// KeyFullname ..
-	KeyFullname Key = "fullname"
+	KeyFullname Key = "name"
 	// KeyPhone ..
 	KeyPhone Key = "phone"
 	// KeyEmail ..
 	KeyEmail Key = "email"
 	// KeyGroupID ..
-	KeyGroupID Key = "groupid"
+	KeyGroupID Key = "group_id"
 	// KeyExp ..
 	KeyExp Key = "exp"
 	// KeyToken ..
 	KeyToken Key = "token"
+	// KeyJti ..
+	KeyJti Key = "jti"
 )
 
 func (k Key) String() string {
@@ -51,6 +53,7 @@ type Context struct {
 	GroupID   int64
 	Exp       time.Time
 	Token     string
+	Jti       string
 }
 
 // SetContext is a function for set value on context
@@ -135,6 +138,11 @@ func GetContext(ctx context.Context) (c Context) {
 		// set expired
 		if ctx.Value(KeyToken) != nil {
 			c.Token = ctx.Value(KeyToken).(string)
+		}
+
+		// set jti
+		if ctx.Value(KeyJti) != nil {
+			c.Jti = ctx.Value(KeyJti).(string)
 		}
 
 	}

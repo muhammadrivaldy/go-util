@@ -9,6 +9,7 @@ require (
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
+	github.com/google/uuid v1.1.1
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/zap v1.18.1
@@ -24,7 +25,6 @@ require (
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
-	github.com/google/uuid v1.1.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.2 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
