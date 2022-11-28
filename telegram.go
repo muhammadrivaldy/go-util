@@ -28,6 +28,11 @@ func NewTele(
 
 func (t *teleService) SendError(ctx context.Context, path string, line int, msg string) (err error) {
 
+	// validate bot tele before send request
+	if t.bot == nil {
+		return nil
+	}
+
 	// template chat to telegram
 	var template = "<b>-===ERROR NOTIFICATION===-</b>\n\n" +
 		"<b>RequestID:</b> --REQUESTID--\n" +
