@@ -47,10 +47,10 @@ type Context struct {
 	Endpoint  string
 	Payload   string
 	UserID    int64
-	Fullname  string
+	Name      string
 	Phone     string
 	Email     string
-	GroupID   int64
+	GroupID   int
 	Exp       time.Time
 	Token     string
 	Jti       string
@@ -106,12 +106,12 @@ func GetContext(ctx context.Context) (c Context) {
 
 		// set user id
 		if ctx.Value(KeyUserID) != nil {
-			c.UserID = int64(ctx.Value(KeyUserID).(float64))
+			c.UserID = ctx.Value(KeyUserID).(int64)
 		}
 
 		// set fullname
 		if ctx.Value(KeyFullname) != nil {
-			c.Fullname = ctx.Value(KeyFullname).(string)
+			c.Name = ctx.Value(KeyFullname).(string)
 		}
 
 		// set phone
@@ -126,12 +126,12 @@ func GetContext(ctx context.Context) (c Context) {
 
 		// set group id
 		if ctx.Value(KeyGroupID) != nil {
-			c.GroupID = int64(ctx.Value(KeyGroupID).(float64))
+			c.GroupID = ctx.Value(KeyGroupID).(int)
 		}
 
 		// set expired
 		if ctx.Value(KeyExp) != nil {
-			timestamp := int64(ctx.Value(KeyExp).(float64))
+			timestamp := ctx.Value(KeyExp).(int64)
 			c.Exp = time.Unix(timestamp, 0)
 		}
 
