@@ -106,7 +106,7 @@ func GetContext(ctx context.Context) (c Context) {
 
 		// set user id
 		if ctx.Value(KeyUserID) != nil {
-			c.UserID = ctx.Value(KeyUserID).(int64)
+			c.UserID = int64(ctx.Value(KeyUserID).(float64))
 		}
 
 		// set fullname
@@ -126,12 +126,12 @@ func GetContext(ctx context.Context) (c Context) {
 
 		// set group id
 		if ctx.Value(KeyGroupID) != nil {
-			c.GroupID = ctx.Value(KeyGroupID).(int)
+			c.GroupID = int(ctx.Value(KeyGroupID).(float64))
 		}
 
 		// set expired
 		if ctx.Value(KeyExp) != nil {
-			timestamp := ctx.Value(KeyExp).(int64)
+			timestamp := int64(ctx.Value(KeyExp).(float64))
 			c.Exp = time.Unix(timestamp, 0)
 		}
 
