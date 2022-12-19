@@ -12,22 +12,22 @@ import (
 type Key string
 
 const (
-	// KeyRequestID ..
-	KeyRequestID Key = "requestid"
+	// KeyRequestId ..
+	KeyRequestId Key = "requestid"
 	// KeyMethod ..
 	KeyMethod Key = "method"
 	// KeyEndpoint ..
 	KeyEndpoint Key = "endpoint"
-	// KeyUserID ..
-	KeyUserID Key = "user_id"
+	// KeyUserId ..
+	KeyUserId Key = "user_id"
 	// KeyFullname ..
 	KeyFullname Key = "name"
 	// KeyPhone ..
 	KeyPhone Key = "phone"
 	// KeyEmail ..
 	KeyEmail Key = "email"
-	// KeyGroupID ..
-	KeyGroupID Key = "group_id"
+	// KeyGroupId ..
+	KeyGroupId Key = "group_id"
 	// KeyExp ..
 	KeyExp Key = "exp"
 	// KeyToken ..
@@ -42,15 +42,15 @@ func (k Key) String() string {
 
 // Context ..
 type Context struct {
-	RequestID string
+	RequestId string
 	Method    string
 	Endpoint  string
 	Payload   string
-	UserID    int64
+	UserId    int64
 	Name      string
 	Phone     string
 	Email     string
-	GroupID   int
+	GroupId   int
 	Exp       time.Time
 	Token     string
 	Jti       string
@@ -63,7 +63,7 @@ func SetContext(c *gin.Context) {
 	ctx := context.Background()
 
 	// set up value (request id, method & endpoint) to context
-	ctx = context.WithValue(ctx, KeyRequestID, requestid.Get(c))
+	ctx = context.WithValue(ctx, KeyRequestId, requestid.Get(c))
 	ctx = context.WithValue(ctx, KeyMethod, c.Request.Method)
 	ctx = context.WithValue(ctx, KeyEndpoint, c.Request.URL.RequestURI())
 
@@ -90,8 +90,8 @@ func GetContext(ctx context.Context) (c Context) {
 	if ctx != nil {
 
 		// set request id
-		if ctx.Value(KeyRequestID) != nil {
-			c.RequestID = ctx.Value(KeyRequestID).(string)
+		if ctx.Value(KeyRequestId) != nil {
+			c.RequestId = ctx.Value(KeyRequestId).(string)
 		}
 
 		// set method
@@ -105,8 +105,8 @@ func GetContext(ctx context.Context) (c Context) {
 		}
 
 		// set user id
-		if ctx.Value(KeyUserID) != nil {
-			c.UserID = int64(ctx.Value(KeyUserID).(float64))
+		if ctx.Value(KeyUserId) != nil {
+			c.UserId = int64(ctx.Value(KeyUserId).(float64))
 		}
 
 		// set fullname
@@ -125,8 +125,8 @@ func GetContext(ctx context.Context) (c Context) {
 		}
 
 		// set group id
-		if ctx.Value(KeyGroupID) != nil {
-			c.GroupID = int(ctx.Value(KeyGroupID).(float64))
+		if ctx.Value(KeyGroupId) != nil {
+			c.GroupId = int(ctx.Value(KeyGroupId).(float64))
 		}
 
 		// set expired
