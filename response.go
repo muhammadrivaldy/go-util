@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type Response struct {
@@ -27,7 +29,7 @@ func ResponseError(c *gin.Context, code int, msg error, obj interface{}) {
 	message := msg.Error()
 	messages := strings.Split(msg.Error(), " ")
 	if len(messages) > 0 {
-		messages[0] = strings.Title(messages[0])
+		messages[0] = cases.Title(language.AmericanEnglish).String(messages[0])
 		message = strings.Join(messages, " ")
 	}
 
