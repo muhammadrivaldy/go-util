@@ -47,14 +47,14 @@ func encodeConfig(osFile *os.File, telegram TeleService) (logs, error) {
 }
 
 // NewLog is a function for set up log information in this service
-func NewLog(osFile *os.File, telegram TeleService) Logs {
+func NewLog(osFile *os.File, telegram TeleService) (Logs, error) {
 
 	logs, err := encodeConfig(osFile, telegram)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return &logs
+	return &logs, nil
 }
 
 func (l *logs) Config(osFile *os.File) {
