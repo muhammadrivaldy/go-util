@@ -18,14 +18,14 @@ type logs struct {
 
 // Logs is a interface of method logging
 type Logs interface {
-	Config(osFile *os.File)
+	Config(osFile *os.File, createOutput bool)
 	Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
 	Error(ctx context.Context, err error)
 	Undo()
 	Sync()
 }
 
-func encodeConfig(osFile *os.File, telegram TeleService) (logs, error) {
+func encodeConfig(osFile *os.File, telegram TeleService, createOutput bool) (logs, error) {
 
 	encoder := zap.NewProductionEncoderConfig()
 	encoder.EncodeTime.UnmarshalText([]byte("ISO8601"))
@@ -33,8 +33,12 @@ func encodeConfig(osFile *os.File, telegram TeleService) (logs, error) {
 	config := zap.NewProductionConfig()
 	config.EncoderConfig = encoder
 	config.DisableStacktrace = true
-	config.OutputPaths = []string{osFile.Name(), os.Stdout.Name()}
-	config.ErrorOutputPaths = config.OutputPaths
+
+	if createOutput == true {
+		config.OutputPaths = []string{osFile.Name(), os.Stdout.Name()}
+		config.ErrorOutputPaths = config.OutputPaths
+	}
+
 	logger, err := config.Build()
 	if err != nil {
 		return logs{}, err
@@ -47,9 +51,9 @@ func encodeConfig(osFile *os.File, telegram TeleService) (logs, error) {
 }
 
 // NewLog is a function for set up log information in this service
-func NewLog(osFile *os.File, telegram TeleService) (Logs, error) {
+func NewLog(osFile *os.File, telegram TeleService, createOutput bool) (Logs, error) {
 
-	logs, err := encodeConfig(osFile, telegram)
+	logs, err := encodeConfig(osFile, telegram, createOutput)
 	if err != nil {
 		return nil, err
 	}
@@ -57,9 +61,9 @@ func NewLog(osFile *os.File, telegram TeleService) (Logs, error) {
 	return &logs, nil
 }
 
-func (l *logs) Config(osFile *os.File) {
+func (l *logs) Config(osFile *os.File, createOutput bool) {
 
-	logs, err := encodeConfig(osFile, l.telegram)
+	logs, err := encodeConfig(osFile, l.telegram, createOutput)
 	if err != nil {
 		return
 	}
