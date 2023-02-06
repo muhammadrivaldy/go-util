@@ -35,7 +35,7 @@ func (t *teleService) SendError(ctx context.Context, path string, line int, msg 
 
 	// template chat to telegram
 	var template = "<b>-===ERROR NOTIFICATION===-</b>\n\n" +
-		"<b>RequestId:</b> --REQUESTId--\n" +
+		"<b>RequestId:</b> --REQUESTID--\n" +
 		"<b>Method:</b> --METHOD--\n" +
 		"<b>Endpoint:</b> --ENDPOINT--\n" +
 		"<b>Error Message:</b> --MESSAGE--\n" +
@@ -53,7 +53,7 @@ func (t *teleService) SendError(ctx context.Context, path string, line int, msg 
 	// if request id exist
 	if res.RequestId != "" {
 		// replace template with value request id
-		template = strings.Replace(template, "--REQUESTId--", res.RequestId, 1)
+		template = strings.Replace(template, "--REQUESTID--", res.RequestId, 1)
 	}
 
 	// if method exist

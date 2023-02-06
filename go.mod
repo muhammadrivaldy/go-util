@@ -13,6 +13,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/zap v1.18.1
+	golang.org/x/text v0.3.6
 	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/mysql v1.1.1

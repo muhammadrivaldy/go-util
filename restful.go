@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime"
 	"mime/multipart"
 	"net/http"
@@ -199,7 +198,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 		if ((i + 1) == r.retry) && response.StatusCode >= http.StatusBadRequest {
 			errorMessage := fmt.Sprintf("Status code: %d / %s", response.StatusCode, http.StatusText(response.StatusCode))
 			if contentType == string(ContentTypeJSON) {
-				resBytes, _ := ioutil.ReadAll(response.Body)
+				resBytes, _ := io.ReadAll(response.Body)
 				errorMessage = fmt.Sprintf("%s, Response: %s", errorMessage, string(resBytes))
 			}
 
@@ -213,7 +212,7 @@ func (r *RESTful) Request(req RequestPayload) (statusCode int, err error) {
 
 			if req.Response != nil {
 
-				resBytes, err := ioutil.ReadAll(response.Body)
+				resBytes, err := io.ReadAll(response.Body)
 				if err != nil {
 					return response.StatusCode, err
 				}
@@ -279,7 +278,7 @@ func (r *RESTful) RequestBasicAuth(req BasicAuthPayload) (statusCode int, err er
 
 			if req.Response != nil {
 
-				resBytes, err := ioutil.ReadAll(response.Body)
+				resBytes, err := io.ReadAll(response.Body)
 				if err != nil {
 					return response.StatusCode, err
 				}
