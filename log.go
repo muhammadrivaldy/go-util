@@ -99,7 +99,7 @@ func (l *logs) Error(ctx context.Context, err error) {
 	_, path, line, _ := runtime.Caller(1)
 
 	// send error to telegram
-	l.telegram.SendError(ctx, path, line, msgError)
+	go l.telegram.SendError(ctx, path, line, msgError)
 
 	// log with info context
 	if ctx != nil {
