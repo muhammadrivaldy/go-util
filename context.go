@@ -26,8 +26,8 @@ const (
 	KeyPhone Key = "phone"
 	// KeyEmail ..
 	KeyEmail Key = "email"
-	// KeyGroupId ..
-	KeyGroupId Key = "group_id"
+	// KeyUserType ..
+	KeyUserType Key = "user_type"
 	// KeyExp ..
 	KeyExp Key = "exp"
 	// KeyToken ..
@@ -125,8 +125,8 @@ func GetContext(ctx context.Context) (c Context) {
 		}
 
 		// set group id
-		if ctx.Value(KeyGroupId) != nil {
-			c.GroupId = int(ctx.Value(KeyGroupId).(float64))
+		if ctx.Value(KeyUserType) != nil {
+			c.GroupId = int(ctx.Value(KeyUserType).(float64))
 		}
 
 		// set expired

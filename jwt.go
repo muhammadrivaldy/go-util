@@ -16,11 +16,11 @@ import (
 // JWT is a object
 type JWT struct {
 	UserId     int64
+	UserType   int
 	Email      string
 	ExpToken   time.Time
 	ExpRefresh time.Time
 	Jti        string
-	Anothers   map[string]interface{}
 }
 
 // CreateJWT is a function for generate token & refresh token
@@ -34,12 +34,10 @@ func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refres
 	t := jwt.New(signMethod)
 	tClaims := t.Claims.(jwt.MapClaims)
 	tClaims["user_id"] = req.UserId
+	tClaims["user_type"] = req.UserId
 	tClaims["email"] = req.Email
 	tClaims["exp"] = req.ExpToken.Unix()
 	tClaims["jti"] = req.Jti
-	for k, i := range req.Anothers {
-		tClaims[k] = i
-	}
 
 	token, err = t.SignedString([]byte(key))
 	if err != nil {
@@ -50,6 +48,7 @@ func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refres
 	r := jwt.New(signMethod)
 	rClaims := r.Claims.(jwt.MapClaims)
 	rClaims["user_id"] = req.UserId
+	tClaims["user_type"] = req.UserId
 	rClaims["exp"] = req.ExpRefresh.Unix()
 	refresh, err = r.SignedString([]byte(key))
 	if err != nil {
@@ -107,7 +106,7 @@ func ParseJWT(key string, signMethod jwt.SigningMethod) func(c *gin.Context) {
 		ctx = context.WithValue(ctx, KeyFullname, claims["name"])
 		ctx = context.WithValue(ctx, KeyPhone, claims["phone"])
 		ctx = context.WithValue(ctx, KeyEmail, claims["email"])
-		ctx = context.WithValue(ctx, KeyGroupId, claims["group_id"])
+		ctx = context.WithValue(ctx, KeyUserType, claims["user_type"])
 		ctx = context.WithValue(ctx, KeyExp, claims["exp"])
 		ctx = context.WithValue(ctx, KeyToken, authorization)
 		ctx = context.WithValue(ctx, KeyJti, claims["jti"])
