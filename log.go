@@ -34,7 +34,7 @@ func encodeConfig(osFile *os.File, telegram TeleService, createOutput bool) (log
 	config.EncoderConfig = encoder
 	config.DisableStacktrace = true
 
-	if createOutput == true {
+	if createOutput {
 		config.OutputPaths = []string{osFile.Name(), os.Stdout.Name()}
 		config.ErrorOutputPaths = config.OutputPaths
 	}
