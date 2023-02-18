@@ -13,7 +13,7 @@ type Key string
 
 const (
 	// KeyRequestId ..
-	KeyRequestId Key = "requestid"
+	KeyRequestId Key = "request_id"
 	// KeyMethod ..
 	KeyMethod Key = "method"
 	// KeyEndpoint ..
@@ -22,8 +22,6 @@ const (
 	KeyUserId Key = "user_id"
 	// KeyFullname ..
 	KeyFullname Key = "name"
-	// KeyPhone ..
-	KeyPhone Key = "phone"
 	// KeyEmail ..
 	KeyEmail Key = "email"
 	// KeyUserType ..
@@ -112,11 +110,6 @@ func GetContext(ctx context.Context) (c Context) {
 		// set fullname
 		if ctx.Value(KeyFullname) != nil {
 			c.Name = ctx.Value(KeyFullname).(string)
-		}
-
-		// set phone
-		if ctx.Value(KeyPhone) != nil {
-			c.Phone = ctx.Value(KeyPhone).(string)
 		}
 
 		// set email

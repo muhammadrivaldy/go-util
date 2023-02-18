@@ -104,7 +104,6 @@ func ParseJWT(key string, signMethod jwt.SigningMethod) func(c *gin.Context) {
 		ctx := ParseContext(c)
 		ctx = context.WithValue(ctx, KeyUserId, claims["user_id"])
 		ctx = context.WithValue(ctx, KeyFullname, claims["name"])
-		ctx = context.WithValue(ctx, KeyPhone, claims["phone"])
 		ctx = context.WithValue(ctx, KeyEmail, claims["email"])
 		ctx = context.WithValue(ctx, KeyUserType, claims["user_type"])
 		ctx = context.WithValue(ctx, KeyExp, claims["exp"])
