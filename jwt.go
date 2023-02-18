@@ -16,13 +16,11 @@ import (
 // JWT is a object
 type JWT struct {
 	UserId     int64
-	Name       string
-	Phone      string
 	Email      string
-	GroupId    int
 	ExpToken   time.Time
 	ExpRefresh time.Time
 	Jti        string
+	Anothers   map[string]interface{}
 }
 
 // CreateJWT is a function for generate token & refresh token
@@ -36,12 +34,13 @@ func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refres
 	t := jwt.New(signMethod)
 	tClaims := t.Claims.(jwt.MapClaims)
 	tClaims["user_id"] = req.UserId
-	tClaims["name"] = req.Name
-	tClaims["phone"] = req.Phone
 	tClaims["email"] = req.Email
-	tClaims["group_id"] = req.GroupId
 	tClaims["exp"] = req.ExpToken.Unix()
 	tClaims["jti"] = req.Jti
+	for k, i := range req.Anothers {
+		tClaims[k] = i
+	}
+
 	token, err = t.SignedString([]byte(key))
 	if err != nil {
 		return
@@ -51,7 +50,6 @@ func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refres
 	r := jwt.New(signMethod)
 	rClaims := r.Claims.(jwt.MapClaims)
 	rClaims["user_id"] = req.UserId
-	rClaims["group_id"] = req.GroupId
 	rClaims["exp"] = req.ExpRefresh.Unix()
 	refresh, err = r.SignedString([]byte(key))
 	if err != nil {
