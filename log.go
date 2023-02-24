@@ -79,7 +79,7 @@ func (l *logs) Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
 
 	zapcore := zapcoreField(ctx)
 	if zapFields != nil {
-		zapcore = append(zapcore, zapFields...)
+		zapcore = append(zapFields, zapcore...)
 	}
 
 	if ctx != nil {
