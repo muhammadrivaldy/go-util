@@ -19,7 +19,7 @@ func init() {
 func TestValidation(t *testing.T) {
 	user := User{
 		Name:      "Muhammad Rivaldy",
-		Age:       11,
+		Age:       1,
 		CreatedBy: 0,
 	}
 

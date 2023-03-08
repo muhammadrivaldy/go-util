@@ -51,7 +51,9 @@ func (vt *validation) ValidationStruct(req interface{}) error {
 	if err := vt.v.Struct(req); err != nil {
 		var temp []string
 		for _, errs := range err.(validator.ValidationErrors) {
-			temp = append(temp, errs.Translate(vt.trans))
+			newField := stringy.New(errs.Field()).SnakeCase().ToLower()
+			tempMessage := strings.Replace(errs.Translate(vt.trans), errs.Field(), newField, -1)
+			temp = append(temp, tempMessage)
 		}
 		return errors.New(strings.Join(temp, ", "))
 	}
@@ -78,49 +80,49 @@ func registerTranslation(validate *validator.Validate, trans ut.Translator) erro
 	_ = validate.RegisterTranslation("required", trans, func(ut ut.Translator) error {
 		return ut.Add("required", "{0} is a required field", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("required", stringy.New(fe.Field()).SnakeCase().ToLower())
+		t, _ := ut.T("required", fe.Field())
 		return t
 	})
 
 	_ = validate.RegisterTranslation("number", trans, func(ut ut.Translator) error {
 		return ut.Add("number", "{0} must be number", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("number", stringy.New(fe.Field()).SnakeCase().ToLower())
+		t, _ := ut.T("number", fe.Field())
 		return t
 	})
 
 	_ = validate.RegisterTranslation("email", trans, func(ut ut.Translator) error {
 		return ut.Add("email", "{0} must be a valid email", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("email", stringy.New(fe.Field()).SnakeCase().ToLower())
+		t, _ := ut.T("email", fe.Field())
 		return t
 	})
 
 	_ = validate.RegisterTranslation("phone", trans, func(ut ut.Translator) error {
 		return ut.Add("phone", "{0} must be a valid phone", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("phone", stringy.New(fe.Field()).SnakeCase().ToLower())
+		t, _ := ut.T("phone", fe.Field())
 		return t
 	})
 
 	_ = validate.RegisterTranslation("jpg", trans, func(ut ut.Translator) error {
 		return ut.Add("jpg", "{0} must be a valid format", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("jpg", stringy.New(fe.Field()).SnakeCase().ToLower())
+		t, _ := ut.T("jpg", fe.Field())
 		return t
 	})
 
 	_ = validate.RegisterTranslation("png", trans, func(ut ut.Translator) error {
 		return ut.Add("png", "{0} must be a valid format", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("png", stringy.New(fe.Field()).SnakeCase().ToLower())
+		t, _ := ut.T("png", fe.Field())
 		return t
 	})
 
 	_ = validate.RegisterTranslation("pdf", trans, func(ut ut.Translator) error {
 		return ut.Add("pdf", "{0} must be a valid format", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("pdf", stringy.New(fe.Field()).SnakeCase().ToLower())
+		t, _ := ut.T("pdf", fe.Field())
 		return t
 	})
 
