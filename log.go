@@ -20,6 +20,7 @@ type logs struct {
 type Logs interface {
 	Config(osFile *os.File, createOutput bool)
 	Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
+	Warning(ctx context.Context, err error)
 	Error(ctx context.Context, err error)
 	Undo()
 	Sync()
@@ -88,6 +89,21 @@ func (l *logs) Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
 	}
 
 	l.logger.Info(msg)
+}
+
+func (l *logs) Warning(ctx context.Context, err error) {
+
+	// convert error to string
+	msgError := err.Error()
+
+	// log with info context
+	if ctx != nil {
+		l.logger.Warn(msgError, zapcoreField(ctx)...)
+		return
+	}
+
+	// log without info context
+	l.logger.Warn(msgError)
 }
 
 func (l *logs) Error(ctx context.Context, err error) {
