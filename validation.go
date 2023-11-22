@@ -134,7 +134,7 @@ func registerTranslation(validate *validator.Validate, trans ut.Translator) erro
 func registerValidation(validate *validator.Validate) error {
 
 	if err := validate.RegisterValidation("phone", func(fl validator.FieldLevel) bool {
-		charValidation := regexp.MustCompile(`^0(\d{0,12})$`)
+		charValidation := regexp.MustCompile(`^\+(\d{0,12})$`)
 		return charValidation.MatchString(fl.Field().String())
 	}); err != nil {
 		return err
