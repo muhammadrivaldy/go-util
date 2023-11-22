@@ -98,13 +98,6 @@ func registerTranslation(validate *validator.Validate, trans ut.Translator) erro
 		return t
 	})
 
-	_ = validate.RegisterTranslation("phone", trans, func(ut ut.Translator) error {
-		return ut.Add("phone", "{0} must be a valid phone", true)
-	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("phone", fe.Field())
-		return t
-	})
-
 	_ = validate.RegisterTranslation("jpg", trans, func(ut ut.Translator) error {
 		return ut.Add("jpg", "{0} must be a valid format", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
@@ -132,13 +125,6 @@ func registerTranslation(validate *validator.Validate, trans ut.Translator) erro
 
 // register validation
 func registerValidation(validate *validator.Validate) error {
-
-	if err := validate.RegisterValidation("phone", func(fl validator.FieldLevel) bool {
-		charValidation := regexp.MustCompile(`^\+(\d{0,12})$`)
-		return charValidation.MatchString(fl.Field().String())
-	}); err != nil {
-		return err
-	}
 
 	if err := validate.RegisterValidation("jpg", func(fl validator.FieldLevel) bool {
 		charValidation := regexp.MustCompile(`^.(jpg|jpeg|JPG|JPEG)$`)
