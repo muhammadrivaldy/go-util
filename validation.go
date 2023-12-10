@@ -14,7 +14,7 @@ import (
 
 type Validation struct {
 	v     *validator.Validate
-	trans ut.Translator
+	trans *ut.Translator
 }
 
 func NewValidation() (Validation, error) {
@@ -29,7 +29,7 @@ func NewValidation() (Validation, error) {
 	en_translations.RegisterDefaultTranslations(validate, trans)
 
 	// send validate connection
-	return Validation{validate, trans}, nil
+	return Validation{validate, &trans}, nil
 
 }
 
@@ -41,7 +41,7 @@ func (vt *Validation) ValidationStruct(req interface{}) error {
 
 		for _, errs := range err.(validator.ValidationErrors) {
 			newField := stringy.New(errs.Field()).SnakeCase().ToLower()
-			tempMessage := strings.Replace(errs.Translate(vt.trans), errs.Field(), newField, -1)
+			tempMessage := strings.Replace(errs.Translate(*vt.trans), errs.Field(), newField, -1)
 			temp = append(temp, tempMessage)
 		}
 
@@ -63,7 +63,7 @@ func (vt *Validation) ValidationVariable(req interface{}, tag string, msgErr str
 
 }
 
-type RegisterTranslation func(v *validator.Validate, trans ut.Translator) error
+type RegisterTranslation func(v *validator.Validate, trans *ut.Translator) error
 
 func (vt *Validation) RegisterTranslation(translations ...RegisterTranslation) (err error) {
 
@@ -73,7 +73,7 @@ func (vt *Validation) RegisterTranslation(translations ...RegisterTranslation) (
 		return t
 	}
 
-	err = vt.v.RegisterTranslation("jpg", vt.trans, registerJPG, translationJPG)
+	err = vt.v.RegisterTranslation("jpg", *vt.trans, registerJPG, translationJPG)
 	if err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func (vt *Validation) RegisterTranslation(translations ...RegisterTranslation) (
 		return t
 	}
 
-	err = vt.v.RegisterTranslation("png", vt.trans, registerPNG, translationPNG)
+	err = vt.v.RegisterTranslation("png", *vt.trans, registerPNG, translationPNG)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func (vt *Validation) RegisterTranslation(translations ...RegisterTranslation) (
 		return t
 	}
 
-	err = vt.v.RegisterTranslation("pdf", vt.trans, registerPDF, translationPDF)
+	err = vt.v.RegisterTranslation("pdf", *vt.trans, registerPDF, translationPDF)
 	if err != nil {
 		return err
 	}
