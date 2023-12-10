@@ -12,12 +12,12 @@ import (
 	en_translations "gopkg.in/go-playground/validator.v9/translations/en"
 )
 
-type validation struct {
+type Validation struct {
 	v     *validator.Validate
 	trans ut.Translator
 }
 
-func NewValidation() (validation, error) {
+func NewValidation() (Validation, error) {
 
 	// translator
 	en := en.New()
@@ -29,11 +29,11 @@ func NewValidation() (validation, error) {
 	en_translations.RegisterDefaultTranslations(validate, trans)
 
 	// send validate connection
-	return validation{validate, trans}, nil
+	return Validation{validate, trans}, nil
 
 }
 
-func (vt *validation) ValidationStruct(req interface{}) error {
+func (vt *Validation) ValidationStruct(req interface{}) error {
 
 	if err := vt.v.Struct(req); err != nil {
 
@@ -53,7 +53,7 @@ func (vt *validation) ValidationStruct(req interface{}) error {
 
 }
 
-func (vt *validation) ValidationVariable(req interface{}, tag string, msgErr string) error {
+func (vt *Validation) ValidationVariable(req interface{}, tag string, msgErr string) error {
 
 	if err := vt.v.Var(req, tag); err != nil {
 		return errors.New(msgErr)
@@ -65,7 +65,7 @@ func (vt *validation) ValidationVariable(req interface{}, tag string, msgErr str
 
 type RegisterTranslation func(v *validator.Validate, trans ut.Translator) error
 
-func (vt *validation) RegisterTranslation(translations ...RegisterTranslation) (err error) {
+func (vt *Validation) RegisterTranslation(translations ...RegisterTranslation) (err error) {
 
 	registerJPG := func(ut ut.Translator) error { return ut.Add("jpg", "{0} must be a valid format", true) }
 	translationJPG := func(ut ut.Translator, fe validator.FieldError) string {
@@ -113,7 +113,7 @@ func (vt *validation) RegisterTranslation(translations ...RegisterTranslation) (
 
 type RegisterValidation func(v *validator.Validate) error
 
-func (vt *validation) RegisterValidation(validations ...RegisterValidation) (err error) {
+func (vt *Validation) RegisterValidation(validations ...RegisterValidation) (err error) {
 
 	validatorJPG := func(fl validator.FieldLevel) bool {
 		charValidation := regexp.MustCompile(`^.(jpg|jpeg|JPG|JPEG)$`)

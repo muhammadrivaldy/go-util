@@ -8,7 +8,7 @@ type User struct {
 	CreatedBy int    `validate:"required"`
 }
 
-var tValidation validation
+var tValidation Validation
 
 func init() {
 	tValidation, _ = NewValidation()
