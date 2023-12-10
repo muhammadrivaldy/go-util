@@ -7,9 +7,9 @@ import (
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator/v10"
+	en_translations "github.com/go-playground/validator/v10/translations/en"
 	"github.com/gobeam/stringy"
-	"gopkg.in/go-playground/validator.v9"
-	en_translations "gopkg.in/go-playground/validator.v9/translations/en"
 )
 
 type Validation struct {
