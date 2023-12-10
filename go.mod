@@ -13,6 +13,7 @@ require (
 	github.com/golang/protobuf v1.5.0
 	github.com/google/uuid v1.1.1
 	github.com/jmoiron/sqlx v1.3.4
+	github.com/lib/pq v1.2.0
 	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/mdp/qrterminal/v3 v3.1.1
 	github.com/stretchr/testify v1.8.1
