@@ -12,14 +12,14 @@ import (
 type Key string
 
 const (
-	// KeyRequestId ..
-	KeyRequestId Key = "request_id"
+	// KeyRequestID ..
+	KeyRequestID Key = "request_id"
 	// KeyMethod ..
 	KeyMethod Key = "method"
 	// KeyEndpoint ..
 	KeyEndpoint Key = "endpoint"
-	// KeyUserId ..
-	KeyUserId Key = "user_id"
+	// KeyUserID ..
+	KeyUserID Key = "user_id"
 	// KeyFullname ..
 	KeyFullname Key = "name"
 	// KeyEmail ..
@@ -40,15 +40,15 @@ func (k Key) String() string {
 
 // Context ..
 type Context struct {
-	RequestId string
+	RequestID string
 	Method    string
 	Endpoint  string
 	Payload   string
-	UserId    int64
+	UserID    int64
 	Name      string
 	Phone     string
 	Email     string
-	GroupId   int
+	GroupID   int
 	Exp       time.Time
 	Token     string
 	Jti       string
@@ -61,7 +61,7 @@ func SetContext(c *gin.Context) {
 	ctx := context.Background()
 
 	// set up value (request id, method & endpoint) to context
-	ctx = context.WithValue(ctx, KeyRequestId, requestid.Get(c))
+	ctx = context.WithValue(ctx, KeyRequestID, requestid.Get(c))
 	ctx = context.WithValue(ctx, KeyMethod, c.Request.Method)
 	ctx = context.WithValue(ctx, KeyEndpoint, c.Request.URL.RequestURI())
 
@@ -88,8 +88,8 @@ func GetContext(ctx context.Context) (c Context) {
 	if ctx != nil {
 
 		// set request id
-		if ctx.Value(KeyRequestId) != nil {
-			c.RequestId = ctx.Value(KeyRequestId).(string)
+		if ctx.Value(KeyRequestID) != nil {
+			c.RequestID = ctx.Value(KeyRequestID).(string)
 		}
 
 		// set method
@@ -103,8 +103,8 @@ func GetContext(ctx context.Context) (c Context) {
 		}
 
 		// set user id
-		if ctx.Value(KeyUserId) != nil {
-			c.UserId = int64(ctx.Value(KeyUserId).(float64))
+		if ctx.Value(KeyUserID) != nil {
+			c.UserID = int64(ctx.Value(KeyUserID).(float64))
 		}
 
 		// set fullname
@@ -119,7 +119,7 @@ func GetContext(ctx context.Context) (c Context) {
 
 		// set group id
 		if ctx.Value(KeyUserType) != nil {
-			c.GroupId = int(ctx.Value(KeyUserType).(float64))
+			c.GroupID = int(ctx.Value(KeyUserType).(float64))
 		}
 
 		// set expired

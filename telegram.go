@@ -9,7 +9,7 @@ import (
 )
 
 type teleService struct {
-	chatId int64
+	chatID int64
 	bot    *tgbotapi.BotAPI
 }
 
@@ -21,9 +21,9 @@ type TeleService interface {
 // NewTele is a function open connection
 func NewTele(
 	token string,
-	chatId int64) (tele TeleService, err error) {
+	chatID int64) (tele TeleService, err error) {
 	bot, err := tgbotapi.NewBotAPI(token)
-	return &teleService{bot: bot, chatId: chatId}, err
+	return &teleService{bot: bot, chatID: chatID}, err
 }
 
 func (t *teleService) SendError(ctx context.Context, path string, line int, msg string) (err error) {
@@ -51,9 +51,9 @@ func (t *teleService) SendError(ctx context.Context, path string, line int, msg 
 	template = strings.Replace(template, "--LINE--", fmt.Sprint(line), 1)
 
 	// if request id exist
-	if res.RequestId != "" {
+	if res.RequestID != "" {
 		// replace template with value request id
-		template = strings.Replace(template, "--REQUESTID--", res.RequestId, 1)
+		template = strings.Replace(template, "--REQUESTID--", res.RequestID, 1)
 	}
 
 	// if method exist
@@ -69,7 +69,7 @@ func (t *teleService) SendError(ctx context.Context, path string, line int, msg 
 	}
 
 	// config bot
-	message := tgbotapi.NewMessage(t.chatId, template)
+	message := tgbotapi.NewMessage(t.chatID, template)
 	message.ParseMode = "HTML"
 
 	// send message

@@ -15,7 +15,7 @@ import (
 
 // JWT is a object
 type JWT struct {
-	UserId     int64
+	UserID     int64
 	UserType   int
 	Email      string
 	ExpToken   time.Time
@@ -33,7 +33,7 @@ func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refres
 	// create jwt token
 	t := jwt.New(signMethod)
 	tClaims := t.Claims.(jwt.MapClaims)
-	tClaims["user_id"] = req.UserId
+	tClaims["user_id"] = req.UserID
 	tClaims["user_type"] = req.UserType
 	tClaims["email"] = req.Email
 	tClaims["exp"] = req.ExpToken.Unix()
@@ -47,7 +47,7 @@ func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refres
 	// create refresh jwt token
 	r := jwt.New(signMethod)
 	rClaims := r.Claims.(jwt.MapClaims)
-	rClaims["user_id"] = req.UserId
+	rClaims["user_id"] = req.UserID
 	rClaims["user_type"] = req.UserType
 	rClaims["exp"] = req.ExpRefresh.Unix()
 	refresh, err = r.SignedString([]byte(key))
@@ -102,7 +102,7 @@ func ParseJWT(key string, signMethod jwt.SigningMethod) func(c *gin.Context) {
 
 		// set value of token to gin.context
 		ctx := ParseContext(c)
-		ctx = context.WithValue(ctx, KeyUserId, claims["user_id"])
+		ctx = context.WithValue(ctx, KeyUserID, claims["user_id"])
 		ctx = context.WithValue(ctx, KeyFullname, claims["name"])
 		ctx = context.WithValue(ctx, KeyEmail, claims["email"])
 		ctx = context.WithValue(ctx, KeyUserType, claims["user_type"])
