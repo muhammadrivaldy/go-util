@@ -13,31 +13,22 @@ import (
 )
 
 type RequestCreateJWT struct {
-	SignMethod      jwt.SigningMethod
-	Key             string
-	TokenMap        jwt.MapClaims
-	RefreshTokenMap jwt.MapClaims
+	SignMethod jwt.SigningMethod
+	Key        string
+	Data       jwt.MapClaims
 }
 
-// CreateJWT is a function for generate token & refresh token
-func CreateJWT(req RequestCreateJWT) (token, refresh string, err error) {
+// CreateJWT is a function for generate token
+func CreateJWT(req RequestCreateJWT) (token string, err error) {
 
-	if _, ok := req.TokenMap["jti"]; !ok {
-		req.TokenMap["jti"] = uuid.New().String()
+	if _, ok := req.Data["jti"]; !ok {
+		req.Data["jti"] = uuid.New().String()
 	}
 
 	// create jwt token
 	t := jwt.New(req.SignMethod)
-	t.Claims = req.TokenMap
+	t.Claims = req.Data
 	token, err = t.SignedString([]byte(req.Key))
-	if err != nil {
-		return
-	}
-
-	// create refresh jwt token
-	r := jwt.New(req.SignMethod)
-	r.Claims = req.RefreshTokenMap
-	refresh, err = r.SignedString([]byte(req.Key))
 	if err != nil {
 		return
 	}
