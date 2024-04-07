@@ -6,51 +6,38 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-// JWT is a object
-type JWT struct {
-	UserID     int64
-	UserType   int
-	Email      string
-	ExpToken   time.Time
-	ExpRefresh time.Time
-	Jti        string
+type RequestCreateJWT struct {
+	SignMethod      jwt.SigningMethod
+	Key             string
+	TokenMap        jwt.MapClaims
+	RefreshTokenMap jwt.MapClaims
 }
 
 // CreateJWT is a function for generate token & refresh token
-func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refresh string, err error) {
+func CreateJWT(req RequestCreateJWT) (token, refresh string, err error) {
 
-	if req.Jti == "" {
-		req.Jti = uuid.New().String()
+	if _, ok := req.TokenMap["jti"]; !ok {
+		req.TokenMap["jti"] = uuid.New().String()
 	}
 
 	// create jwt token
-	t := jwt.New(signMethod)
-	tClaims := t.Claims.(jwt.MapClaims)
-	tClaims["user_id"] = req.UserID
-	tClaims["user_type"] = req.UserType
-	tClaims["email"] = req.Email
-	tClaims["exp"] = req.ExpToken.Unix()
-	tClaims["jti"] = req.Jti
-
-	token, err = t.SignedString([]byte(key))
+	t := jwt.New(req.SignMethod)
+	t.Claims = req.TokenMap
+	token, err = t.SignedString([]byte(req.Key))
 	if err != nil {
 		return
 	}
 
 	// create refresh jwt token
-	r := jwt.New(signMethod)
-	rClaims := r.Claims.(jwt.MapClaims)
-	rClaims["user_id"] = req.UserID
-	rClaims["user_type"] = req.UserType
-	rClaims["exp"] = req.ExpRefresh.Unix()
-	refresh, err = r.SignedString([]byte(key))
+	r := jwt.New(req.SignMethod)
+	r.Claims = req.RefreshTokenMap
+	refresh, err = r.SignedString([]byte(req.Key))
 	if err != nil {
 		return
 	}
@@ -59,8 +46,10 @@ func CreateJWT(req JWT, signMethod jwt.SigningMethod, key string) (token, refres
 
 }
 
+type KeyContext string
+
 // ParseJWT is a function for parse of token string
-func ParseJWT(key string, signMethod jwt.SigningMethod) func(c *gin.Context) {
+func ParseJWT(key string, signMethod jwt.SigningMethod, attributesJWT []string) func(c *gin.Context) {
 	return func(c *gin.Context) {
 
 		// get value authorization from header
@@ -100,15 +89,15 @@ func ParseJWT(key string, signMethod jwt.SigningMethod) func(c *gin.Context) {
 			return
 		}
 
-		// set value of token to gin.context
+		// set value of token to context
 		ctx := ParseContext(c)
-		ctx = context.WithValue(ctx, KeyUserID, claims["user_id"])
-		ctx = context.WithValue(ctx, KeyFullname, claims["name"])
-		ctx = context.WithValue(ctx, KeyEmail, claims["email"])
-		ctx = context.WithValue(ctx, KeyUserType, claims["user_type"])
-		ctx = context.WithValue(ctx, KeyExp, claims["exp"])
 		ctx = context.WithValue(ctx, KeyToken, authorization)
-		ctx = context.WithValue(ctx, KeyJti, claims["jti"])
+		for _, attribute := range attributesJWT {
+			value, ok := claims[attribute]
+			if ok {
+				ctx = context.WithValue(ctx, KeyContext(attribute), value)
+			}
+		}
 
 		// set up context.Context to gin.Context
 		c.Set("context", ctx)
