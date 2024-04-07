@@ -43,7 +43,7 @@ func (t *teleService) SendError(ctx context.Context, path string, line int, msg 
 		"<b>Line:</b> --LINE--"
 
 	// get context value from context
-	res := GetContext(ctx)
+	res := getContext(ctx)
 
 	// replate template with message value
 	template = strings.Replace(template, "--MESSAGE--", msg, 1)

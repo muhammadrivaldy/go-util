@@ -137,7 +137,7 @@ func (l *logs) Sync() {
 
 func zapcoreField(ctx context.Context) (zapFields []zapcore.Field) {
 
-	res := GetContext(ctx)
+	res := getContext(ctx)
 	zapFields = append(zapFields, zap.String("request-id", res.RequestID))
 	zapFields = append(zapFields, zap.String("method", res.Method))
 	zapFields = append(zapFields, zap.String("endpoint", res.Endpoint))
