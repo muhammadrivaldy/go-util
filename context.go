@@ -37,7 +37,7 @@ type Context struct {
 	Name      string
 	Phone     string
 	Email     string
-	GroupID   int
+	UserType  int
 	Exp       time.Time
 	Token     string
 	Jti       string
@@ -102,7 +102,7 @@ func GetContext(ctx context.Context) (c Context) {
 		}
 
 		if ctx.Value(KeyUserType) != nil {
-			c.GroupID = int(ctx.Value(KeyUserType).(float64))
+			c.UserType = int(ctx.Value(KeyUserType).(float64))
 		}
 
 		if ctx.Value(KeyExp) != nil {
