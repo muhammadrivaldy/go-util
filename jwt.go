@@ -12,6 +12,9 @@ import (
 	"github.com/google/uuid"
 )
 
+const MainToken = "main-token"
+const RefreshToken = "refresh-token"
+
 type RequestCreateJWT struct {
 	SignMethod jwt.SigningMethod
 	Key        string
