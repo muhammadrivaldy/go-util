@@ -6,12 +6,13 @@ import (
 	"runtime"
 
 	"github.com/gin-gonic/gin"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 type logs struct {
-	logger   *zap.Logger
+	logger   *otelzap.Logger
 	undo     func()
 	telegram TeleService
 }
@@ -46,7 +47,7 @@ func encodeConfig(osFile *os.File, telegram TeleService, createOutput bool) (log
 	}
 
 	return logs{
-		logger:   logger.WithOptions(zap.AddCallerSkip(1)),
+		logger:   otelzap.New(logger.WithOptions(zap.AddCallerSkip(1))),
 		undo:     zap.RedirectStdLog(logger),
 		telegram: telegram}, nil
 }
