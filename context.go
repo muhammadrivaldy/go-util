@@ -30,7 +30,7 @@ type Context struct {
 func SetContext(c *gin.Context) {
 
 	// declare variable context.Context
-	ctx := context.Background()
+	ctx := c.Request.Context()
 
 	// set up value (request id, method & endpoint) to context
 	ctx = context.WithValue(ctx, KeyRequestID, requestid.Get(c))
