@@ -85,47 +85,39 @@ func (l *logs) Info(ctx context.Context, msg string, zapFields ...zapcore.Field)
 	}
 
 	if ctx != nil {
-		l.logger.Info(msg, zapcore...)
+		l.logger.InfoContext(ctx, msg, zapcore...)
 		return
 	}
 
-	l.logger.Info(msg)
+	l.logger.InfoContext(ctx, msg)
 }
 
 func (l *logs) Warning(ctx context.Context, err error) {
 
-	// convert error to string
 	msgError := err.Error()
 
-	// log with info context
 	if ctx != nil {
-		l.logger.Warn(msgError, zapcoreField(ctx)...)
+		l.logger.WarnContext(ctx, msgError, zapcoreField(ctx)...)
 		return
 	}
 
-	// log without info context
-	l.logger.Warn(msgError)
+	l.logger.WarnContext(ctx, msgError)
 }
 
 func (l *logs) Error(ctx context.Context, err error) {
 
-	// convert error to string
 	msgError := err.Error()
 
-	// get path & line
 	_, path, line, _ := runtime.Caller(1)
 
-	// send error to telegram
 	go l.telegram.SendError(ctx, path, line, msgError)
 
-	// log with info context
 	if ctx != nil {
-		l.logger.Error(msgError, zapcoreField(ctx)...)
+		l.logger.ErrorContext(ctx, msgError, zapcoreField(ctx)...)
 		return
 	}
 
-	// log without info context
-	l.logger.Error(msgError)
+	l.logger.ErrorContext(ctx, msgError)
 }
 
 func (l *logs) Undo() {
