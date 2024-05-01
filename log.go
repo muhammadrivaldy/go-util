@@ -47,7 +47,7 @@ func encodeConfig(osFile *os.File, telegram TeleService, createOutput bool) (log
 	}
 
 	return logs{
-		logger:   otelzap.New(logger.WithOptions(zap.AddCallerSkip(1))),
+		logger:   otelzap.New(logger.WithOptions(zap.AddCallerSkip(1)), otelzap.WithCallerDepth(1)),
 		undo:     zap.RedirectStdLog(logger),
 		telegram: telegram}, nil
 }
