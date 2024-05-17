@@ -26,7 +26,7 @@ func TestValidation(t *testing.T) {
 		CreatedBy: 0,
 	}
 
-	if validationErrors := tValidation.ValidationStruct(user); len(validationErrors.Errors) > 1 {
+	if validationErrors := tValidation.ValidationStruct(user); validationErrors.IsErrorExists() {
 		errorInformations, _ := json.Marshal(validationErrors)
 		t.Log(string(errorInformations))
 	}

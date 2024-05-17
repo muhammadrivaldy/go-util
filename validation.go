@@ -41,6 +41,10 @@ type ValidationError struct {
 	Message string `json:"message"`
 }
 
+func (v ValidationErrors) IsErrorExists() bool {
+	return len(v.Errors) > 0
+}
+
 func (vt *Validation) ValidationStruct(req interface{}) (validationError ValidationErrors) {
 
 	if err := vt.v.Struct(req); err != nil {
