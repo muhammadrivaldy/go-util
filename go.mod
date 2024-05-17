@@ -12,7 +12,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
-	github.com/gobeam/stringy v0.0.6
 	github.com/golang/protobuf v1.5.0
 	github.com/google/uuid v1.1.1
 	github.com/jmoiron/sqlx v1.3.4

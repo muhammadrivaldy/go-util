@@ -1,7 +1,7 @@
 package goutil
 
 import (
-	"errors"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -9,7 +9,6 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
-	"github.com/gobeam/stringy"
 )
 
 type Validation struct {
@@ -33,34 +32,43 @@ func NewValidation() (Validation, error) {
 
 }
 
-func (vt *Validation) ValidationStruct(req interface{}) error {
+type ValidationErrors struct {
+	Errors []ValidationError `json:"errors"`
+}
+
+type ValidationError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
+func (vt *Validation) ValidationStruct(req interface{}) (validationError ValidationErrors) {
 
 	if err := vt.v.Struct(req); err != nil {
 
-		var temp []string
-
 		for _, errs := range err.(validator.ValidationErrors) {
-			newField := stringy.New(errs.Field()).SnakeCase().ToLower()
-			tempMessage := strings.Replace(errs.Translate(*vt.trans), errs.Field(), newField, -1)
-			temp = append(temp, tempMessage)
+
+			field, _ := reflect.TypeOf(req).FieldByName(errs.Field())
+			filedJSONName, _ := field.Tag.Lookup("json")
+			validationError.Errors = append(validationError.Errors, ValidationError{
+				Field:   filedJSONName,
+				Message: strings.Replace(errs.Translate(*vt.trans), errs.Field(), filedJSONName, -1),
+			})
 		}
-
-		return errors.New(strings.Join(temp, ", "))
-
 	}
 
-	return nil
-
+	return
 }
 
-func (vt *Validation) ValidationVariable(req interface{}, tag string, msgErr string) error {
+func (vt *Validation) ValidationVariable(req interface{}, tag string, msgErr string) (validationError ValidationErrors) {
 
 	if err := vt.v.Var(req, tag); err != nil {
-		return errors.New(msgErr)
+		validationError.Errors = append(validationError.Errors, ValidationError{
+			Field:   tag,
+			Message: msgErr,
+		})
 	}
 
-	return nil
-
+	return
 }
 
 type RegisterTranslation func(v *validator.Validate, trans *ut.Translator) error

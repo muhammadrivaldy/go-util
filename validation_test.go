@@ -1,11 +1,14 @@
 package goutil
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 type User struct {
-	Name      string `validate:"required"`
-	Age       int    `validate:"min=10,max=40"`
-	CreatedBy int    `validate:"required"`
+	Name      string `json:"name" validate:"required"`
+	Age       int    `json:"age" validate:"min=10,max=40"`
+	CreatedBy int    `json:"created_by" validate:"required"`
 }
 
 var tValidation Validation
@@ -23,7 +26,8 @@ func TestValidation(t *testing.T) {
 		CreatedBy: 0,
 	}
 
-	if err := tValidation.ValidationStruct(user); err != nil {
-		t.Log(err.Error())
+	if validationErrors := tValidation.ValidationStruct(user); len(validationErrors.Errors) > 1 {
+		errorInformations, _ := json.Marshal(validationErrors)
+		t.Log(string(errorInformations))
 	}
 }
