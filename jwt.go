@@ -46,10 +46,12 @@ type KeyContext string
 func ParseJWT(key string, signMethod jwt.SigningMethod, attributesJWT []string) func(c *gin.Context) {
 	return func(c *gin.Context) {
 
+		errToken := errors.New("token is not valid")
+
 		// get value authorization from header
 		var authorization = c.GetHeader("authorization")
 		if ok := strings.Contains(authorization, "Bearer "); !ok {
-			ResponseError(c, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)), nil)
+			ResponseError(c, http.StatusUnauthorized, errToken, nil)
 			c.Abort()
 			return
 		}
@@ -70,7 +72,7 @@ func ParseJWT(key string, signMethod jwt.SigningMethod, attributesJWT []string) 
 
 		// handle error
 		if err != nil {
-			ResponseError(c, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)), nil)
+			ResponseError(c, http.StatusUnauthorized, errToken, nil)
 			c.Abort()
 			return
 		}
@@ -78,7 +80,7 @@ func ParseJWT(key string, signMethod jwt.SigningMethod, attributesJWT []string) 
 		// claim token
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			ResponseError(c, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)), nil)
+			ResponseError(c, http.StatusUnauthorized, errToken, nil)
 			c.Abort()
 			return
 		}
