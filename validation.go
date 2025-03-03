@@ -63,11 +63,11 @@ func (vt *Validation) ValidationStruct(req interface{}) (validationError Validat
 	return
 }
 
-func (vt *Validation) ValidationVariable(req interface{}, tag string, msgErr string) (validationError ValidationErrors) {
+func (vt *Validation) ValidationVariable(req interface{}, attributeName string, tag string, msgErr string) (validationError ValidationErrors) {
 
 	if err := vt.v.Var(req, tag); err != nil {
 		validationError.Errors = append(validationError.Errors, ValidationError{
-			Field:   tag,
+			Field:   attributeName,
 			Message: msgErr,
 		})
 	}
