@@ -112,6 +112,17 @@ func (vt *Validation) RegisterTranslation(translations ...RegisterTranslation) (
 		return err
 	}
 
+	registerImage := func(ut ut.Translator) error { return ut.Add("image", "{0} must be a valid format", true) }
+	translationImage := func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("image", fe.Field())
+		return t
+	}
+
+	err = vt.v.RegisterTranslation("image", *vt.trans, registerImage, translationImage)
+	if err != nil {
+		return err
+	}
+
 	for _, transFunc := range translations {
 		err = transFunc(vt.v, vt.trans)
 		if err != nil {
@@ -153,6 +164,16 @@ func (vt *Validation) RegisterValidation(validations ...RegisterValidation) (err
 	}
 
 	err = vt.v.RegisterValidation("pdf", validatorPDF)
+	if err != nil {
+		return err
+	}
+
+	validatorImage := func(fl validator.FieldLevel) bool {
+		charValidation := regexp.MustCompile(`^.(jpg|jpeg|png|JPG|JPEG|PNG)$`)
+		return charValidation.MatchString(fl.Field().String())
+	}
+
+	err = vt.v.RegisterValidation("image", validatorImage)
 	if err != nil {
 		return err
 	}
